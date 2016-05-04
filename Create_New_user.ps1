@@ -13,6 +13,9 @@ New-Msoluser -userPrincipalName $_.UserPrincipalName -displayname $_.displayname
 Write-Host "Applying Mailbox features:"
 #Enable or Disable OWA,IMAP, MAPI and POP3
 Set-CASMailbox $_.UserPrincipalName -OWAEnabled $True -PopEnabled $False -MAPIEnabled $false -ImapEnabled $false -ActiveSyncEnabled $false
+
+# Set-Mailbox -Identity $_.UserPrincipalName -AuditEnabled $true (Copy until tested, enables auditing as per pen test requirement)
+
 #Enforce MFA on user account
 
 $mf= New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
@@ -22,10 +25,10 @@ $mfa = @($mf)
 Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $mfa
  
 
-#Add user to the Home Office Digital group
+#Add user to the Home Office Digital group (on hold until issue re mail enabled security groups is resolved)
 
-$user = Get-Msoluser -UserPrincipalName $_.Userprincipalname | select Objectid 
-Add-MsolGroupMember -groupObjectid ‘6d743fec-af0e-4c94-be4d-abfc603e852b’ -GroupMemberObjectId $user.ObjectId -GroupMemberType User
+#$user = Get-Msoluser -UserPrincipalName $_.Userprincipalname | select Objectid 
+#Add-MsolGroupMember -groupObjectid ‘6d743fec-af0e-4c94-be4d-abfc603e852b’ -GroupMemberObjectId $user.ObjectId -GroupMemberType User
 
 #Enable litigation holdget
 Set-Mailbox $_.UserPrincipalName -LitigationHoldEnabled $true
