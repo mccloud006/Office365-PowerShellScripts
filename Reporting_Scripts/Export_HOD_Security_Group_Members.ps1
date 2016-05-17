@@ -1,0 +1,2 @@
+﻿#Export a list of all users in the Home Office Digital security group to a .csv file
+Get-MsolGroupMember -groupObjectid '6d743fec-af0e-4c94-be4d-abfc603e852b' | Select DisplayName,EmailAddress,GroupMemberType | Export-csv C:\o365\HOD-security-group-members.csv

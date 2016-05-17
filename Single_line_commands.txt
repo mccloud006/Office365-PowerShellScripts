@@ -1,0 +1,9 @@
+# The following are commands that need editing for use e.g. to enter the users name
+
+# Command to set a user to require a strong password
+ Set-Msoluser -userprincipalname "user@domain.com" -StrongPasswordRequired $true
+
+
+#Command to Reset a user password from the command line in Powershell
+Set-MsolUserPassword –UserPrincipalName [UserPrincipalName]–NewPassword [NewPassword]
+
