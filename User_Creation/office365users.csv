@@ -1,1 +1,2 @@
-test.user6@digital.homeoffice.gov.uk,Test User6,Test,User6
+UserPrincipalName,DisplayName,Firstname,Lastname,Department,Password
+Test.User20@digital.homeoffice.gov.uk,Test User20,Test,User20,Home Office Digital,somelongpassword123

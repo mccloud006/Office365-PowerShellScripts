@@ -11,16 +11,23 @@ import-csv $path | foreach {
 Write-Host "Creating new account for:" $_.displayname
 New-Msoluser -UserPrincipalName $_.UserPrincipalName -Displayname $_.displayname -Firstname $_.firstname -Lastname $_.lastname -Password $_.Password -LicenseAssignment $server -LicenseOptions $LO -usagelocation "GB"#| set-msoluserlicense -addlicenses "$server"
 
-Start-Sleep -s 60
+Write-Host "Waiting 240 seconds before applying Mailbox features!"
+Start-Sleep -s 240
 
 Write-Host "Applying Mailbox features:"
 
 #Enable or Disable OWA,IMAP, MAPI and POP3
 Set-CASMailbox $_.UserPrincipalName -OWAEnabled $True -PopEnabled $False -MAPIEnabled $false -ImapEnabled $false -ActiveSyncEnabled $false
 
-# Set-Mailbox -Identity $_.UserPrincipalName -AuditEnabled $true (Copy until tested, enables auditing as per pen test requirement)
+# Enables auditing on user account as recomendation
+Set-Mailbox  $_.UserPrincipalName -AuditEnabled $true 
+
+# Enables Archiving on user account as recomendation
+enable-mailbox $_.UserPrincipalName -Archive
 
 Start-Sleep -s 10
+
+Write-Host "Enforce MFA on user account:"
 #Enforce MFA on user account
 
 $mf= New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
@@ -28,19 +35,18 @@ $mf.RelyingParty = "*"
 $mfa = @($mf)
 
 Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $mfa
- 
 
 Start-Sleep -s 10
+Write-Host "Adding to Home Office Digital Group:"
 #Add user to the Home Office Digital group (revised approch by DE to add to the MailEnabledSecurityGroup)
 
-$user = Get-Msoluser -UserPrincipalName $_.Userprincipalname | select Objectid 
-Add-DistributionGroupMember -Identity "HomeOfficeDigital" -Member $user -BypassSecurityGroupManagerCheck
+# $user = Get-Msoluser -UserPrincipalName $_.Userprincipalname | select Objectid 
+Add-DistributionGroupMember -Identity "HomeOfficeDigital" -Member $_.Userprincipalname -BypassSecurityGroupManagerCheck
 
-
+Write-Host "Enable litigation hold:"
 #Enable litigation hold
 Set-Mailbox $_.UserPrincipalName -LitigationHoldEnabled $true
 
 #Send a welcome email to the user.
-
+Write-Host "That User is complete:"
 }
-
